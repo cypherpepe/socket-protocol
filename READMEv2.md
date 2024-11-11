@@ -86,6 +86,23 @@ By running the deployment script, we deployed three key contracts:
 3. **Logic Contract**
    - Provides chain-specific functionality.
 
+
+These three contracts where deployed on the Watcher VM Chain. The VM chain details are:
+
+- RPC: https://rpc-cloud-broken-leg-7uu20euqoj.t.conduit.xyz
+- Chain ID: 3605
+- Explorer: https://explorer-cloud-broken-leg-7uu20euqoj.t.conduit.xyz/
+
+Some key addresses to validate payload execution, assigning forwarder addresses, among other details:
+
+```json
+{
+  "WatcherVM": "0xd415B777cdb5B364D754e18228c2bDb30214E20e",
+  "AddressResolver": "0xA11aB16e4D2870127Fd1a7F2AFA0AF9692637e8e",
+  "PayloadDelivery": "0xa3Ffc503FD5927C02f1cC1F5C1701F7453CAeDb0"
+}
+```
+
 ### Architecture Details
 
 - **Deployer and Application Contracts**: These live on an *offchain* Watcher VM. The Watcher VM monitors cross-chain events and triggers *onchain* actions on the contracts deployed on respective chains.
