@@ -1,10 +1,9 @@
-# Getting Started with Socket Chain Abstraction
-
 This guide will help you build chain-abstracted applications using our framework. The framework simplifies the development of applications that need to interact across different blockchains.
 
----
+## Table of Contents
 
 - [Getting Started](#getting-started)
+  - [Setting Up Your Environment](#setting-up-your-environment)
 - [Deploying a Counter](#deploying-a-counter)
 - [Incrementing the Counter on a Specific Chain](#incrementing-the-counter-on-a-specific-chain)
   - [Find a Chain Specific Forwarder Address](#find-a-chain-specific-forwarder-address)
@@ -25,6 +24,18 @@ This guide will help you build chain-abstracted applications using our framework
 We will explore a chain-abstracted version of the `Counter.sol` contract, inspired by the default Foundry example. The purpose of this example is to demonstrate how to implement counter logic in a way that abstracts away the details of the specific blockchain where the contract is deployed.
 
 The goal is to provide a simple and intuitive interface for increasing a counter, ensuring that the underlying logic works seamlessly across different chains without requiring the developer to manage chain-specific details or configurations.
+
+### Setting Up Your Environment
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/SocketDotTech/socket-protocol.git
+   cd socket-protocol
+   ```
+2. **Install Dependencies:**
+   ```bash
+   yarn install
+   ```
 
 ## Deploying a Counter
 
@@ -182,7 +193,7 @@ Base URL  :  https://72e5x0myo8.execute-api.us-east-1.amazonaws.com/dev/
 
 By running the deployment script, we deployed three key contracts.
 
-### Deployer Contract - Your Counter Onchain Deployer Contract
+### Deployer Contract - Manage your chain-abstracted contract deployments
 
 This contract:
 
@@ -221,7 +232,7 @@ contract CounterDeployer is AppDeployerBase {
 }
 ```
 
-### Application Gateway Contract - Your Chain-abstracted Counter Application
+### Application Gateway Contract - Your chain-abstracted application that handles cross-chain messaging
 
 This contract:
 
@@ -245,7 +256,7 @@ contract CounterGateway is AppGatewayBase {
 }
 ```
 
-### Logic Contract - Your Counter Contract deployed on chain
+### Logic Contract - Your onchain operational contract
 
 Provides chain-specific functionality.
 
@@ -273,14 +284,27 @@ contract CounterPlug is Ownable(msg.sender) {
 }
 ```
 
-These three contracts where deployed on the Watcher VM Chain. The VM chain details are:
+These three contracts were deployed on the Watcher VM Chain.
 
-- RPC: https://rpc-cloud-broken-leg-7uu20euqoj.t.conduit.xyz
-- Chain ID: 3605
-- Explorer: https://explorer-cloud-broken-leg-7uu20euqoj.t.conduit.xyz/
+### Architecture Details
 
-Some key addresses to validate payload execution, assigning forwarder addresses, among other details:
+Our architecture includes onchain and offchain contracts and an offchain Watcher VM that facilitates cross-chain communication.
 
+- **Deployer and Application Gateway Contracts**: These live on an offchain Watcher VM. The Watcher VM monitors cross-chain events and triggers onchain actions on the contracts deployed on respective chains.
+- **Logic Contract**: This is the onchain component responsible for chain-specific logic and integration.
+
+
+![architecure diagram](images/architecture.png)
+
+If you notice, the Forwarder Address is a proxy representation created on the VM chain. Any calls to onchain contracts should be sent to the corresponding proxy contract, which will route the call properly to the on chain contract via Payload Delivery. See [how to find a chain specific-forwarder-address](#find-a-chain-specific-forwarder-address)
+
+### Watcher VM Details
+
+- **RPC**: `https://rpc-cloud-broken-leg-7uu20euqoj.t.conduit.xyz`
+- **Chain ID**: 3605
+- **Explorer**: `https://explorer-cloud-broken-leg-7uu20euqoj.t.conduit.xyz`
+
+Key addresses:
 ```json
 {
   "WatcherVM": "0xd415B777cdb5B364D754e18228c2bDb30214E20e",
@@ -289,12 +313,4 @@ Some key addresses to validate payload execution, assigning forwarder addresses,
 }
 ```
 
-### Architecture Details
-
-- **Deployer and Application Gateway Contracts**: These live on an _offchain_ Watcher VM. The Watcher VM monitors cross-chain events and triggers _onchain_ actions on the contracts deployed on respective chains.
-- **Logic Contract**: This is the _onchain_ component responsible for chain-specific logic and integration.
-
-
-![architecure diagram](images/architecture.png)
-
-If you notice, the Forwarder Address is a proxy representation created on the VM chain. Any calls to onchain contracts should be sent to the corresponding proxy contract, which will route the call properly to the on chain contract via Payload Delivery. See [how to find a chain specific-forwarder-address](#find-a-chain-specific-forwarder-address)
+The architecture leverages the Watcher VM for monitoring and relaying cross-chain messages efficiently.
