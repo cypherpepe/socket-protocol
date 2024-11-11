@@ -1,106 +1,39 @@
-# Getting Started with Socket Chain Abstraction
-
 This guide will help you build chain-abstracted applications using our framework. The framework simplifies the development of applications that need to interact across different blockchains.
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Deploying a chain-abstracted Counter contract](#deploying-a-counter)
-  - [Incrementing the counter](#incrementing-the-counter-on-a-specific-chain)
-  - [Covering gas and fees to be executed onchain](#paying-for-your-transaction-to-be-sent-onchain)
+- [Getting Started](#getting-started)
+  - [Setting Up Your Environment](#setting-up-your-environment)
+- [Deploying a Counter](#deploying-a-counter)
+- [Incrementing the Counter on a Specific Chain](#incrementing-the-counter-on-a-specific-chain)
+  - [Find a Chain Specific Forwarder Address](#find-a-chain-specific-forwarder-address)
+- [Validating that the Payload was Sent](#validating-that-the-payload-was-sent)
+- [Paying for Your Transaction to Be Sent Onchain](#paying-for-your-transaction-to-be-sent-onchain)
+  - [How to Pay Fees Through Any Chain](#how-to-pay-fees-through-any-chain)
+- [API Description](#api-description)
 - [What We Just Deployed](#what-we-just-deployed)
-  - [Architecture](#architecture-details)
+  - [Deployer Contract - Your Counter Onchain Deployer Contract](#deployer-contract---your-counter-onchain-deployer-contract)
+  - [Application Gateway Contract - Your Chain-abstracted Counter Application](#application-gateway-contract---your-chain-abstracted-counter-application)
+  - [Logic Contract - Your Counter Contract Deployed On Chain](#logic-contract---your-counter-contract-deployed-on-chain)
+- [Architecture Details](#architecture-details)
 
----
-
-## Overview
+## Getting Started
 
 We will explore a chain-abstracted version of the `Counter.sol` contract, inspired by the default Foundry example. The purpose of this example is to demonstrate how to implement counter logic in a way that abstracts away the details of the specific blockchain where the contract is deployed.
 
 The goal is to provide a simple and intuitive interface for increasing a counter, ensuring that the underlying logic works seamlessly across different chains without requiring the developer to manage chain-specific details or configurations.
 
----
-## Getting Started
+### Setting Up Your Environment
 
-### Create Your Counter Deployer Contract
-```solidity
-contract CounterDeployer is AppDeployerBase {
-    address public counterPlug;
-
-    constructor(
-        address addressResolver_,
-        FeesData memory feesData_
-    ) AppDeployerBase(addressResolver_, feesData_) Ownable(msg.sender) {
-        counterPlug = address(new CounterPlug());
-        creationCodeWithArgs[counterPlug] = type(CounterPlug).creationCode;
-    }
-
-    function deployContracts(
-        uint32 chainSlug
-    ) external queueAndDeploy(chainSlug) {
-        _deploy(counterPlug);
-    }
-
-    function initialize(uint32 chainSlug) public override queueAndExecute {
-        address payloadDeliveryPlug = watcher().appGatewayPlugs(
-            addressResolver.auctionHouse(),
-            chainSlug
-        );
-
-        CounterPlug(forwarderAddresses[counterPlug][chainSlug]).setSocket(
-            payloadDeliveryPlug
-        );
-    }
-}
-
-```
-
-### Create your Chain-abstracted Counter App
-
-```solidity
-contract CounterGateway is AppGatewayBase {
-    constructor(
-        address _addressResolver,
-        address deployerContract_,
-        FeesData memory feesData_
-    ) AppGatewayBase(_addressResolver, feesData_) Ownable(msg.sender) {
-        addressResolver.setContractsToGateways(deployerContract_);
-    }
-
-    function incrementCounter(address _instance) public queueAndExecute {
-        CounterPlug(_instance).increase();
-    }
-}
-
-```
-
-
-### Create your Counter Contract (deployed on chain)
-
-```solidity
-contract CounterPlug is Ownable(msg.sender) {
-    address public socket;
-    uint256 public counter;
-
-    modifier onlySocket() {
-        require(msg.sender == socket, "not sokcet");
-        _;
-    }
-
-    function setSocket(address _socket) external onlyOwner {
-        socket = _socket;
-    }
-
-    function getSocket() external view returns (address) {
-        return socket;
-    }
-
-    function increase() external onlySocket {
-        counter++;
-    }
-}
-
-```
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/SocketDotTech/socket-protocol.git
+   cd socket-protocol
+   ```
+2. **Install Dependencies:**
+   ```bash
+   yarn install
+   ```
 
 ## Deploying a Counter
 
@@ -121,7 +54,7 @@ Let's start by deploying a chain-abstracted Counter Deployer Contract by followi
      ```
    - For more details on what was deployed, see [What We Just Deployed](#what-we-just-deployed). Otherwise, continue to increment the counter on a specific chain
 
----
+[Go Back Up](#table-of-contents)
 
 ## Incrementing the Counter on a Specific Chain
 
@@ -134,6 +67,9 @@ cast send <CONTRACT_ADDRESS> "incrementCounter(address)" <FORWARDER_ADDRESS> --p
 - Ensure `$PRIVATE_KEY` and `$SOCKET_RPC` are correctly set in your `.env` file
 - Replace `<CONTRACT_ADDRESS>` with the address of the deployed `CounterGateway` contract
 - Replace `<FORWARDER_ADDRESS>` with the Forwarder address of the instance to increment
+
+### Find a Chain Specific Forwarder Address
+
   To get the Forwarder address of the onchain contracts, you have two options:
 
   1. Read the variable `counterPlug` address from the CounterDeployer contract on the explorer or run
@@ -155,9 +91,9 @@ cast send <CONTRACT_ADDRESS> "incrementCounter(address)" <FORWARDER_ADDRESS> --p
 
 Each chain that has a contract deployed maintains a Forwarder Address on the Watcher VM that allows for seamless chain-abstracted functionality. Learn more about the architecture details [here](#architecture-details)
 
----
+[Go Back Up](#table-of-contents)
 
-## Validating that the payload was sent
+## Validating that the Payload was Sent
 
 To ensure and validate the payload to `incrementCounter` was sent to the Watcher Contract be executed onchain run:
 
@@ -190,9 +126,9 @@ The `FinalizeRequested` event will not be emitted for your transaction if there 
 
 Currently, Socket is relaying all transactions onchain so execution will not stop. In the near future, the Transmitter will check if it has enough to charge for gas and fees before bidding for the transaction to be executed onchain.
 
----
+[Go Back Up](#table-of-contents)
 
-## Paying for your transaction to be sent onchain
+## Paying for Your Transaction to Be Sent Onchain
 
 In the example `Counter.s.sol`, it was chosen to pay up to 0.01 Ether in Arbitrum Sepolia.
 
@@ -220,7 +156,7 @@ cast send 0xe396468dFcBbccedD1B464300b036D0B8722f3FF "deposit(address,uint256,ad
 - Replace `<AMOUNT>` with more than 0.01 ETH
 - Replace `<COUNTER_GATEWAY_ADDRESS>` with the address of the deployed `CounterGateway` contract
 
-### How to pay fees through any chain
+### How to Pay Fees Through Any Chain
 
 In Socket's chain abstraction you state in which chain, which token and how much you're willing to pay when deploying the Deployer and Application Gateway contracts. This information is sent in the `FeesData` structure of the `constructor` arguments.
 
@@ -234,13 +170,13 @@ struct FeesData {
 
 The Watcher VM will then take that information into account when submitting any onchain transaction. Find out in which chains you can pay for gas [here](https://github.com/SocketDotTech/socket-poc/blob/main/deployments/dev_addresses.json).
 
----
+[Go Back Up](#table-of-contents)
 
 ## API Description
 
 This API provides essential debugging endpoints to help you troubleshoot and monitor your payload processing pipeline. You can track individual payloads, inspect batch operations, verify gateway interactions, and retrieve forwarder addresses. These endpoints are designed to give you visibility into transaction status, execution details, and system configurations when you need to understand what's happening under the hood.
 
-Base URL  :  https://72e5x0myo8.execute-api.us-east-1.amazonaws.com/dev/ 
+Base URL  :  https://72e5x0myo8.execute-api.us-east-1.amazonaws.com/dev/
 | **Endpoint**                      | **Method**                                                  | **Description**                                                     | **Parameters**                                                                                                                                        | **Returns**                                                                                |
 | ----------                        | ---------                                                   | -------------                                                       | ------------                                                                                                                                          | ---------                                                                                  |
 | `/getForwarderAddress`            | GET                                                         | Returns forwarder address for given chain and contract parameters   | - `chainSlug` (string): Chain identifier - `contractName` (string): Name of the contract - `appDeployerAddress` (string): Address of the app deployer | Forwarder address for the specified parameters                                             |
@@ -249,31 +185,132 @@ Base URL  :  https://72e5x0myo8.execute-api.us-east-1.amazonaws.com/dev/
 | `/payloadBatchHashesByAppGateway` | GET                                                         | Returns payload batch hashes associated with an app gateway address | `appGateway` (string): Address of the app gateway to fetch batches for                                                                                | Array of payload batch hashes                                                              |
 | `/payloadBatchesByVMTxHash`       | GET                                                         | Returns payload batches associated with a VM transaction hash       | `vmTxHash` (string): Transaction hash to fetch batches for                                                                                            | Array of payload batch details                                                             |
 
----
+[Go Back Up](#table-of-contents)
 
 ## What We Just Deployed
 
-By running the deployment script, we deployed three key contracts:
+By running the deployment script, we deployed three key contracts.
 
-1. **Deployer Contract**
+### Deployer Contract - Manage Your Chain-abstracted Contract Deployments
+
+This contract:
 
    - Handles contract deployment across multiple chains.
    - Configures chain-abstracted connections.
    - Sets up permissions and manages relationships between contracts.
 
-2. **Application Gateway Contract**
+```solidity
+contract CounterDeployer is AppDeployerBase {
+    address public counterPlug;
+
+    constructor(
+        address addressResolver_,
+        FeesData memory feesData_
+    ) AppDeployerBase(addressResolver_, feesData_) Ownable(msg.sender) {
+        counterPlug = address(new CounterPlug());
+        creationCodeWithArgs[counterPlug] = type(CounterPlug).creationCode;
+    }
+
+    function deployContracts(
+        uint32 chainSlug
+    ) external queueAndDeploy(chainSlug) {
+        _deploy(counterPlug);
+    }
+
+    function initialize(uint32 chainSlug) public override queueAndExecute {
+        address payloadDeliveryPlug = watcher().appGatewayPlugs(
+            addressResolver.auctionHouse(),
+            chainSlug
+        );
+
+        CounterPlug(forwarderAddresses[counterPlug][chainSlug]).setSocket(
+            payloadDeliveryPlug
+        );
+    }
+}
+```
+
+### Application Gateway Contract - Your Chain-abstracted Counter Application
+
+This contract:
 
    - Implements the core business logic.
    - Handles cross-chain message processing.
    - Manages state transitions across different chains.
 
-3. **Logic Contract**
-   - Provides chain-specific functionality.
+```solidity
+contract CounterGateway is AppGatewayBase {
+    constructor(
+        address _addressResolver,
+        address deployerContract_,
+        FeesData memory feesData_
+    ) AppGatewayBase(_addressResolver, feesData_) Ownable(msg.sender) {
+        addressResolver.setContractsToGateways(deployerContract_);
+    }
+
+    function incrementCounter(address _instance) public queueAndExecute {
+        CounterPlug(_instance).increase();
+    }
+}
+```
+
+### Logic Contract - Your Counter Contract Deployed On Chain
+
+Provides chain-specific functionality.
+
+```solidity
+contract CounterPlug is Ownable(msg.sender) {
+    address public socket;
+    uint256 public counter;
+
+    modifier onlySocket() {
+        require(msg.sender == socket, "not sokcet");
+        _;
+    }
+
+    function setSocket(address _socket) external onlyOwner {
+        socket = _socket;
+    }
+
+    function getSocket() external view returns (address) {
+        return socket;
+    }
+
+    function increase() external onlySocket {
+        counter++;
+    }
+}
+```
+
+These three contracts were deployed on the Watcher VM Chain.
 
 ### Architecture Details
 
-- **Deployer and Application Gateway Contracts**: These live on an _offchain_ Watcher VM. The Watcher VM monitors cross-chain events and triggers _onchain_ actions on the contracts deployed on respective chains.
-- **Logic Contract**: This is the _onchain_ component responsible for chain-specific logic and integration.
+Our architecture includes onchain and offchain contracts and an offchain Watcher VM that facilitates cross-chain communication.
+
+- **Deployer and Application Gateway Contracts**: These live on an offchain Watcher VM. The Watcher VM monitors cross-chain events and triggers onchain actions on the contracts deployed on respective chains.
+- **Logic Contract**: This is the onchain component responsible for chain-specific logic and integration.
 
 
-![architecure diagram](images/architecture.png)
+![architecure diagram](docs/images/architecture.png)
+
+If you notice, the Forwarder Address is a proxy representation created on the VM chain. Any calls to onchain contracts should be sent to the corresponding proxy contract, which will route the call properly to the on chain contract via Payload Delivery. See [how to find a chain specific-forwarder-address](#find-a-chain-specific-forwarder-address)
+
+### Watcher VM Details
+
+- **RPC**: `https://rpc-cloud-broken-leg-7uu20euqoj.t.conduit.xyz`
+- **Chain ID**: 3605
+- **Explorer**: `https://explorer-cloud-broken-leg-7uu20euqoj.t.conduit.xyz`
+
+Key addresses:
+```json
+{
+  "WatcherVM": "0xd415B777cdb5B364D754e18228c2bDb30214E20e",
+  "AddressResolver": "0xA11aB16e4D2870127Fd1a7F2AFA0AF9692637e8e",
+  "PayloadDelivery": "0xa3Ffc503FD5927C02f1cC1F5C1701F7453CAeDb0"
+}
+```
+
+The architecture leverages the Watcher VM for monitoring and relaying cross-chain messages efficiently.
+
+[Go Back Up](#table-of-contents)
