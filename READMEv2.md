@@ -57,8 +57,8 @@ Each chain that has a contract deployed maintains a Forwarder Address that allow
 
 This API provides essential debugging endpoints to help you troubleshoot and monitor your payload processing pipeline. You can track individual payloads, inspect batch operations, verify gateway interactions, and retrieve forwarder addresses. These endpoints are designed to give you visibility into transaction status, execution details, and system configurations when you need to understand what's happening under the hood.
 
-| Base URL | https://72e5x0myo8.execute-api.us-east-1.amazonaws.com/dev/ |
-|----------|------------------------|
+Base URL: https://72e5x0myo8.execute-api.us-east-1.amazonaws.com/dev/
+
 | **Endpoint** | **Method** | **Description** | **Parameters** | **Returns** |
 |----------|---------|-------------|------------|---------|
 | `/getForwarderAddress` | GET | Returns forwarder address for given chain and contract parameters | - `chainSlug` (string): Chain identifier - `contractName` (string): Name of the contract - `appDeployerAddress` (string): Address of the app deployer | Forwarder address for the specified parameters |
