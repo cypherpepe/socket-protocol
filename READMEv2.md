@@ -78,7 +78,7 @@ By running the deployment script, we deployed three key contracts:
    - Configures chain-abstracted connections.
    - Sets up permissions and manages relationships between contracts.
 
-2. **Composer Contract**
+2. **Application Contract**
    - Implements the core business logic.
    - Handles cross-chain message processing.
    - Manages state transitions across different chains.
@@ -88,7 +88,7 @@ By running the deployment script, we deployed three key contracts:
 
 ### Architecture Details
 
-- **Deployer and Composer Contracts**: These live on an *offchain* Watcher VM. The Watcher VM monitors cross-chain events and triggers *onchain* actions on the contracts deployed on respective chains.
+- **Deployer and Application Contracts**: These live on an *offchain* Watcher VM. The Watcher VM monitors cross-chain events and triggers *onchain* actions on the contracts deployed on respective chains.
 - **Logic Contract**: This is the *onchain* component responsible for chain-specific logic and integration.
 ![architecure diagram](images/architecture.png)
 
