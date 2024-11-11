@@ -1,0 +1,76 @@
+@startuml
+
+skinparam backgroundColor #EEEBDC
+skinparam handwritten false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+
+skinparam actor {
+  BackgroundColor #ADD8E6
+  BorderColor #4682B4
+}
+
+skinparam rectangle {
+  BackgroundColor #FEFECE
+  BorderColor #A80036
+  ArrowColor #A80036
+  FontColor #A80036
+}
+
+skinparam arrow {
+  Color #A80036
+  FontColor #A80036
+}
+
+actor User #ADD8E6
+actor Watcher #98FB98
+actor Transmitter #FFA07A
+
+rectangle SuperTokenAppGateway
+rectangle PayloadDeliveryAppGateway
+rectangle WatcherVM
+rectangle Socket
+rectangle FastSwitchboard
+rectangle PayloadDeliveryPlug
+rectangle SuperTokenPlug
+
+User -[#0000FF]-> SuperTokenAppGateway : 1. submitOrder
+SuperTokenAppGateway -[#0000FF]-> PayloadDeliveryAppGateway : 2. deliverPayload(burn,mint)
+PayloadDeliveryAppGateway -[#FF4500]-> Transmitter : 3. sends batch
+Transmitter -[#FF4500]-> PayloadDeliveryAppGateway : 4. bid
+PayloadDeliveryAppGateway -[#0000FF]-> WatcherVM : 5. setTimeout for endAuction
+WatcherVM -[#0000FF]-> PayloadDeliveryAppGateway : 6. endAuction
+PayloadDeliveryAppGateway -[#0000FF]-> WatcherVM : 7. finalize burn payload
+WatcherVM -[#008000]-> Watcher : 8. read finalize request
+Watcher -[#008000]-> WatcherVM : 8. put signature
+Transmitter -[#FF4500]-> FastSwitchboard : 9. attest
+Transmitter -[#FF4500]-> Socket : 10. execute
+Socket -[#0000FF]-> FastSwitchboard : 11. check if packet allowed
+Socket -[#0000FF]-> PayloadDeliveryPlug : 11. inbound
+PayloadDeliveryPlug -[#0000FF]-> SuperTokenPlug : 12. burn
+Transmitter -[#FF4500]-> Watcher : 13. updateExecutionStatus
+Watcher -[#008000]-> Socket : 14. check if payload executed
+Watcher -[#008000]-> WatcherVM : 14. markPayloadExecuted
+WatcherVM -[#0000FF]-> PayloadDeliveryAppGateway : 15. markPayloadExecuted
+PayloadDeliveryAppGateway -[#0000FF]-> WatcherVM : 16. finalize mint payload
+WatcherVM -[#008000]-> Watcher : 17. read finalize request
+Watcher -[#008000]-> WatcherVM : 17. put signature
+Transmitter -[#FF4500]-> FastSwitchboard : 18. attest
+Transmitter -[#FF4500]-> Socket : 19. execute
+Socket -[#0000FF]-> FastSwitchboard : 20. check if packet allowed
+Socket -[#0000FF]-> PayloadDeliveryPlug : 20. inbound
+PayloadDeliveryPlug -[#0000FF]-> SuperTokenPlug : 21. mint
+Transmitter -[#FF4500]-> Watcher : 22. updateExecutionStatus
+Watcher -[#008000]-> Socket : 23. check if payload executed
+Watcher -[#008000]-> WatcherVM : 23. markPayloadExecuted
+WatcherVM -[#0000FF]-> PayloadDeliveryAppGateway : 24. markPayloadExecuted
+PayloadDeliveryAppGateway -[#0000FF]-> WatcherVM : 25. finalize fee payload
+WatcherVM -[#008000]-> Watcher : 26. read finalize request
+Watcher -[#008000]-> WatcherVM : 26. put signature
+Transmitter -[#FF4500]-> FastSwitchboard : 27. attest
+Transmitter -[#FF4500]-> Socket : 28. execute
+Socket -[#0000FF]-> FastSwitchboard : 29. check if packet allowed
+Socket -[#0000FF]-> PayloadDeliveryPlug : 29. inbound
+PayloadDeliveryPlug -[#FF4500]-> Transmitter : 30. transfer fee
+
+@enduml

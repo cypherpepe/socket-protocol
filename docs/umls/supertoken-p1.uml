@@ -1,0 +1,33 @@
+@startuml User_Order_Auction
+
+skinparam dpi 200
+skinparam backgroundColor #F0F8FF
+skinparam handwritten false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowThickness 1.5
+
+skinparam actor {
+  BackgroundColor SteelBlue
+  BorderColor RoyalBlue
+}
+
+skinparam participant {
+  BackgroundColor PaleTurquoise
+  BorderColor DarkTurquoise
+}
+
+actor User
+participant "SuperToken\nAppGateway" as STAG
+participant "PayloadDelivery\nAppGateway" as PDAG
+participant WatcherVM as W
+actor Transmitter as T
+
+User -> STAG : <color:DarkBlue>1. submitOrder</color>
+STAG -> PDAG : <color:DarkBlue>2. deliverPayload(batch)</color>
+PDAG -> T : <color:DarkBlue>3. indexes batch</color>
+T -> PDAG : <color:DarkBlue>4. bid</color>
+PDAG -> W : <color:DarkBlue>5. setTimeout for endAuction</color>
+W -> PDAG : <color:DarkBlue>6. endAuction</color>
+
+@enduml

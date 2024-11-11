@@ -1,0 +1,36 @@
+@startuml Fee_Collection
+
+skinparam dpi 200
+skinparam backgroundColor #F0F8FF
+skinparam handwritten false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowThickness 1.5
+
+skinparam actor {
+  BackgroundColor SteelBlue
+  BorderColor RoyalBlue
+}
+
+skinparam participant {
+  BackgroundColor PaleTurquoise
+  BorderColor DarkTurquoise
+}
+
+participant "PayloadDelivery\nAppGateway" as PDAG
+participant WatcherVM as WVM
+actor Watcher as W
+actor Transmitter as T
+participant "Fast\nSwitchboard" as FS
+participant Socket as S
+participant "PayloadDelivery\nPlug" as PDP
+
+PDAG -> WVM : <color:DarkBlue>25. finalize fee</color>
+WVM <-> W : <color:DarkBlue>26. fee sig</color>
+T -> FS : <color:DarkBlue>27. attest</color>
+T -> S : <color:DarkBlue>28. execute</color>
+S -> FS : <color:DarkBlue>29. allow packet</color>
+S -> PDP : <color:DarkBlue>29. inbound</color>
+PDP -> T : <color:DarkBlue>30. transfer fee</color>
+
+@enduml

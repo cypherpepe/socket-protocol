@@ -1,0 +1,54 @@
+@startuml
+
+skinparam backgroundColor #EEEBDC
+skinparam handwritten false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+
+skinparam actor {
+  BackgroundColor #ADD8E6
+  BorderColor #4682B4
+}
+
+skinparam rectangle {
+  BackgroundColor #FEFECE
+  BorderColor #A80036
+  ArrowColor #A80036
+  FontColor #A80036
+}
+
+skinparam arrow {
+  Color #A80036
+  FontColor #A80036
+}
+
+actor User #ADD8E6
+actor Watcher #98FB98
+actor Transmitter #FFA07A
+
+rectangle SuperTokenAppGateway
+rectangle PayloadDeliveryAppGateway
+rectangle WatcherVM
+rectangle Socket
+rectangle FastSwitchboard
+rectangle TransmitManager
+rectangle PayloadDeliveryPlug
+rectangle SuperTokenPlug
+
+User -[#0000FF]-> SuperTokenAppGateway : 1. submits order
+SuperTokenAppGateway -[#0000FF]-> PayloadDeliveryAppGateway : 2. delivers payload
+PayloadDeliveryAppGateway -[#0000FF]-> WatcherVM : 3. finalizes payload
+WatcherVM -[#008000]-> Watcher : 4. requests signature
+Watcher -[#008000]-> WatcherVM : 5. provides signature
+WatcherVM -[#0000FF]-> TransmitManager : 6. sends finalized payload
+TransmitManager -[#FF4500]-> Transmitter : 7. selects transmitter
+Transmitter -[#FF4500]-> TransmitManager : 8. submits execution
+TransmitManager -[#0000FF]-> Socket : 9. executes payload
+Socket -[#0000FF]-> FastSwitchboard : 10. verifies payload
+FastSwitchboard -[#0000FF]-> Socket : 11. confirms verification
+Socket -[#0000FF]-> PayloadDeliveryPlug : 12. forwards call
+PayloadDeliveryPlug -[#0000FF]-> SuperTokenPlug : 13. executes token operation
+WatcherVM -[#0000FF]-> PayloadDeliveryAppGateway : 14. marks payload as executed
+PayloadDeliveryAppGateway -[#0000FF]-> SuperTokenAppGateway : 15. confirms execution
+
+@enduml

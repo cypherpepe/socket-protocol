@@ -1,0 +1,41 @@
+@startuml Burn_Execution
+
+skinparam dpi 200
+skinparam backgroundColor #F0F8FF
+skinparam handwritten false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowThickness 1.5
+
+skinparam actor {
+  BackgroundColor SteelBlue
+  BorderColor RoyalBlue
+}
+
+skinparam participant {
+  BackgroundColor PaleTurquoise
+  BorderColor DarkTurquoise
+}
+
+participant "PayloadDelivery\nAppGateway" as PDAG
+participant WatcherVM as WVM
+actor Watcher as W
+actor Transmitter as T
+participant "Fast\nSwitchboard" as FS
+participant Socket as S
+participant "PayloadDelivery\nPlug" as PDP
+participant "SuperToken\nPlug" as STP
+
+PDAG -> WVM : <color:DarkBlue>7. finalize burn</color>
+WVM <-> W : <color:DarkBlue>8. burn sig</color>
+T -> FS : <color:DarkBlue>9. attest</color>
+T -> S : <color:DarkBlue>10. execute</color>
+S -> FS : <color:DarkBlue>11. allow packet</color>
+S -> PDP : <color:DarkBlue>11. inbound</color>
+PDP -> STP : <color:DarkBlue>12. burn</color>
+T -> W : <color:DarkBlue>13. update status</color>
+W -> S : <color:DarkBlue>14. check execution</color>
+W -> WVM : <color:DarkBlue>14. mark executed</color>
+WVM -> PDAG : <color:DarkBlue>15. mark executed</color>
+
+@enduml

@@ -1,0 +1,28 @@
+{
+  "3605": {
+    "Watcher": "0x452A837840Da04D10306A5FbAd94a507c6E9b19b",
+    "AddressResolver": "0x9798ea87BbEdB88fA44a62969b3afD11E52eE1A5",
+    "AuctionHouse": "0x78e55eeCe178782C57C20023298Ca9BA64896D6D",
+    "SuperTokenDeployer": "0x0e529dbA867682E29B573f2A58aB251C503470fc",
+    "SuperTokenApp": "0x38EB449D1291D4DbEb819111188c443B541e9ea3",
+    "startBlock": 2492435
+  },
+  "421614": {
+    "SignatureVerifier": "0x8DbE5E9b4A814f691bF1Cd0fDF9A7C8303eacCcD",
+    "Hasher": "0x2b6C7104AFF129C6b00bab08AB555F7c964532FA",
+    "Socket": "0x8e25f7Edfb2d1F6fd61Fc356f71cb5CEfc7733a9",
+    "TransmitManager": "0x00431b1C40B385EFCA218d0ba9a573232bD84941",
+    "FastSwitchboard": "0x8868a55525a5A221B0E81B5B28e037ce356d4b33",
+    "PayloadDeliveryPlug": "0x3C174C10A4513CFDca6aA85F0261bEe81cef09FD",
+    "startBlock": 95528881
+  },
+  "11155420": {
+    "SignatureVerifier": "0x9730A5b33DDFc7172BA312f6AcC72503019787b8",
+    "Hasher": "0xFFf73a05751CFB3496CD6Cb30306f61B1128e733",
+    "Socket": "0x21994B7ba9f20f226f3751aAd6a5606B6889e199",
+    "TransmitManager": "0x9c89b8520b9Ee8f82e5F2c37D53dec87aa9bFD99",
+    "FastSwitchboard": "0x64b7C8CbB1D32bB92455431FB0FD3A76D77ECbd4",
+    "PayloadDeliveryPlug": "0xbB609F0257c8A650Ba25E88f28F7CA7Dd7E184Ba",
+    "startBlock": 19634713
+  }
+}
