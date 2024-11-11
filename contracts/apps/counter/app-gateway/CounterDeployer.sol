@@ -22,7 +22,7 @@ contract CounterDeployer is AppDeployerBase {
     }
 
     function initialize(uint32 chainSlug) public override queueAndExecute {
-        address payloadDeliveryPlug = addressResolver.watcher().appGatewayPlugs(
+        address payloadDeliveryPlug = watcher().appGatewayPlugs(
             addressResolver.auctionHouse(),
             chainSlug
         );

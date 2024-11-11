@@ -38,8 +38,5 @@ contract CounterDeploy is Script {
 
         console.log("Deploying contracts on Arbitrum...");
         deployer.deployContracts(421614);
-
-        console.log("Deploying contracts on Optimism...");
-        deployer.deployContracts(11155420);
     }
 }
