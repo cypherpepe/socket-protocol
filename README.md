@@ -2,13 +2,9 @@
 
 This guide will help you build chain-abstracted applications using our framework. The framework simplifies the development of applications that need to interact across different blockchains.
 
-## Table of Contents
+---
 
-## Table of Contents
 - [Getting Started](#getting-started)
-  - [Create Your Counter Deployer Contract](#create-your-counter-deployer-contract)
-  - [Create Your Chain-abstracted Counter App](#create-your-chain-abstracted-counter-app)
-  - [Create Your Counter Contract (deployed on chain)](#create-your-counter-contract-deployed-on-chain)
 - [Deploying a Counter](#deploying-a-counter)
 - [Incrementing the Counter on a Specific Chain](#incrementing-the-counter-on-a-specific-chain)
   - [Find a Chain Specific Forwarder Address](#find-a-chain-specific-forwarder-address)
@@ -17,7 +13,10 @@ This guide will help you build chain-abstracted applications using our framework
   - [How to Pay Fees Through Any Chain](#how-to-pay-fees-through-any-chain)
 - [API Description](#api-description)
 - [What We Just Deployed](#what-we-just-deployed)
-  - [Architecture Details](#architecture-details)
+  - [Deployer Contract - Your Counter Onchain Deployer Contract](#deployer-contract---your-counter-onchain-deployer-contract)
+  - [Application Gateway Contract - Your Chain-abstracted Counter Application](#application-gateway-contract---your-chain-abstracted-counter-application)
+  - [Logic Contract - Your Counter Contract Deployed On Chain](#logic-contract---your-counter-contract-deployed-on-chain)
+- [Architecture Details](#architecture-details)
 
 ---
 
@@ -26,86 +25,6 @@ This guide will help you build chain-abstracted applications using our framework
 We will explore a chain-abstracted version of the `Counter.sol` contract, inspired by the default Foundry example. The purpose of this example is to demonstrate how to implement counter logic in a way that abstracts away the details of the specific blockchain where the contract is deployed.
 
 The goal is to provide a simple and intuitive interface for increasing a counter, ensuring that the underlying logic works seamlessly across different chains without requiring the developer to manage chain-specific details or configurations.
-
-### Create Your Counter Deployer Contract
-```solidity
-contract CounterDeployer is AppDeployerBase {
-    address public counterPlug;
-
-    constructor(
-        address addressResolver_,
-        FeesData memory feesData_
-    ) AppDeployerBase(addressResolver_, feesData_) Ownable(msg.sender) {
-        counterPlug = address(new CounterPlug());
-        creationCodeWithArgs[counterPlug] = type(CounterPlug).creationCode;
-    }
-
-    function deployContracts(
-        uint32 chainSlug
-    ) external queueAndDeploy(chainSlug) {
-        _deploy(counterPlug);
-    }
-
-    function initialize(uint32 chainSlug) public override queueAndExecute {
-        address payloadDeliveryPlug = watcher().appGatewayPlugs(
-            addressResolver.auctionHouse(),
-            chainSlug
-        );
-
-        CounterPlug(forwarderAddresses[counterPlug][chainSlug]).setSocket(
-            payloadDeliveryPlug
-        );
-    }
-}
-
-```
-
-### Create your Chain-abstracted Counter App
-
-```solidity
-contract CounterGateway is AppGatewayBase {
-    constructor(
-        address _addressResolver,
-        address deployerContract_,
-        FeesData memory feesData_
-    ) AppGatewayBase(_addressResolver, feesData_) Ownable(msg.sender) {
-        addressResolver.setContractsToGateways(deployerContract_);
-    }
-
-    function incrementCounter(address _instance) public queueAndExecute {
-        CounterPlug(_instance).increase();
-    }
-}
-
-```
-
-
-### Create your Counter Contract (deployed on chain)
-
-```solidity
-contract CounterPlug is Ownable(msg.sender) {
-    address public socket;
-    uint256 public counter;
-
-    modifier onlySocket() {
-        require(msg.sender == socket, "not sokcet");
-        _;
-    }
-
-    function setSocket(address _socket) external onlyOwner {
-        socket = _socket;
-    }
-
-    function getSocket() external view returns (address) {
-        return socket;
-    }
-
-    function increase() external onlySocket {
-        counter++;
-    }
-}
-
-```
 
 ## Deploying a Counter
 
@@ -261,24 +180,98 @@ Base URL  :  https://72e5x0myo8.execute-api.us-east-1.amazonaws.com/dev/
 
 ## What We Just Deployed
 
-By running the deployment script, we deployed three key contracts:
+By running the deployment script, we deployed three key contracts.
 
-1. **Deployer Contract**
+### Deployer Contract - Your Counter Onchain Deployer Contract
+
+This contract:
 
    - Handles contract deployment across multiple chains.
    - Configures chain-abstracted connections.
    - Sets up permissions and manages relationships between contracts.
 
-2. **Application Gateway Contract**
+```solidity
+contract CounterDeployer is AppDeployerBase {
+    address public counterPlug;
+
+    constructor(
+        address addressResolver_,
+        FeesData memory feesData_
+    ) AppDeployerBase(addressResolver_, feesData_) Ownable(msg.sender) {
+        counterPlug = address(new CounterPlug());
+        creationCodeWithArgs[counterPlug] = type(CounterPlug).creationCode;
+    }
+
+    function deployContracts(
+        uint32 chainSlug
+    ) external queueAndDeploy(chainSlug) {
+        _deploy(counterPlug);
+    }
+
+    function initialize(uint32 chainSlug) public override queueAndExecute {
+        address payloadDeliveryPlug = watcher().appGatewayPlugs(
+            addressResolver.auctionHouse(),
+            chainSlug
+        );
+
+        CounterPlug(forwarderAddresses[counterPlug][chainSlug]).setSocket(
+            payloadDeliveryPlug
+        );
+    }
+}
+```
+
+### Application Gateway Contract - Your Chain-abstracted Counter Application
+
+This contract:
 
    - Implements the core business logic.
    - Handles cross-chain message processing.
    - Manages state transitions across different chains.
 
-3. **Logic Contract**
+```solidity
+contract CounterGateway is AppGatewayBase {
+    constructor(
+        address _addressResolver,
+        address deployerContract_,
+        FeesData memory feesData_
+    ) AppGatewayBase(_addressResolver, feesData_) Ownable(msg.sender) {
+        addressResolver.setContractsToGateways(deployerContract_);
+    }
 
-   - Provides chain-specific functionality.
+    function incrementCounter(address _instance) public queueAndExecute {
+        CounterPlug(_instance).increase();
+    }
+}
+```
 
+### Logic Contract - Your Counter Contract deployed on chain
+
+Provides chain-specific functionality.
+
+```solidity
+contract CounterPlug is Ownable(msg.sender) {
+    address public socket;
+    uint256 public counter;
+
+    modifier onlySocket() {
+        require(msg.sender == socket, "not sokcet");
+        _;
+    }
+
+    function setSocket(address _socket) external onlyOwner {
+        socket = _socket;
+    }
+
+    function getSocket() external view returns (address) {
+        return socket;
+    }
+
+    function increase() external onlySocket {
+        counter++;
+    }
+}
+```
 
 These three contracts where deployed on the Watcher VM Chain. The VM chain details are:
 
