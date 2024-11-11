@@ -17,8 +17,6 @@ This guide will help you build chain-abstracted applications using our framework
   - [Logic Contract - Your Counter Contract Deployed On Chain](#logic-contract---your-counter-contract-deployed-on-chain)
 - [Architecture Details](#architecture-details)
 
----
-
 ## Getting Started
 
 We will explore a chain-abstracted version of the `Counter.sol` contract, inspired by the default Foundry example. The purpose of this example is to demonstrate how to implement counter logic in a way that abstracts away the details of the specific blockchain where the contract is deployed.
@@ -56,7 +54,7 @@ Let's start by deploying a chain-abstracted Counter Deployer Contract by followi
      ```
    - For more details on what was deployed, see [What We Just Deployed](#what-we-just-deployed). Otherwise, continue to increment the counter on a specific chain
 
----
+[Go Back Up](#table-of-contents)
 
 ## Incrementing the Counter on a Specific Chain
 
@@ -70,7 +68,7 @@ cast send <CONTRACT_ADDRESS> "incrementCounter(address)" <FORWARDER_ADDRESS> --p
 - Replace `<CONTRACT_ADDRESS>` with the address of the deployed `CounterGateway` contract
 - Replace `<FORWARDER_ADDRESS>` with the Forwarder address of the instance to increment
 
-### Find a chain specific Forwarder Address
+### Find a Chain Specific Forwarder Address
 
   To get the Forwarder address of the onchain contracts, you have two options:
 
@@ -93,9 +91,9 @@ cast send <CONTRACT_ADDRESS> "incrementCounter(address)" <FORWARDER_ADDRESS> --p
 
 Each chain that has a contract deployed maintains a Forwarder Address on the Watcher VM that allows for seamless chain-abstracted functionality. Learn more about the architecture details [here](#architecture-details)
 
----
+[Go Back Up](#table-of-contents)
 
-## Validating that the payload was sent
+## Validating that the Payload was Sent
 
 To ensure and validate the payload to `incrementCounter` was sent to the Watcher Contract be executed onchain run:
 
@@ -128,9 +126,9 @@ The `FinalizeRequested` event will not be emitted for your transaction if there 
 
 Currently, Socket is relaying all transactions onchain so execution will not stop. In the near future, the Transmitter will check if it has enough to charge for gas and fees before bidding for the transaction to be executed onchain.
 
----
+[Go Back Up](#table-of-contents)
 
-## Paying for your transaction to be sent onchain
+## Paying for Your Transaction to Be Sent Onchain
 
 In the example `Counter.s.sol`, it was chosen to pay up to 0.01 Ether in Arbitrum Sepolia.
 
@@ -158,7 +156,7 @@ cast send 0xe396468dFcBbccedD1B464300b036D0B8722f3FF "deposit(address,uint256,ad
 - Replace `<AMOUNT>` with more than 0.01 ETH
 - Replace `<COUNTER_GATEWAY_ADDRESS>` with the address of the deployed `CounterGateway` contract
 
-### How to pay fees through any chain
+### How to Pay Fees Through Any Chain
 
 In Socket's chain abstraction you state in which chain, which token and how much you're willing to pay when deploying the Deployer and Application Gateway contracts. This information is sent in the `FeesData` structure of the `constructor` arguments.
 
@@ -172,7 +170,7 @@ struct FeesData {
 
 The Watcher VM will then take that information into account when submitting any onchain transaction. Find out in which chains you can pay for gas [here](https://github.com/SocketDotTech/socket-poc/blob/main/deployments/dev_addresses.json).
 
----
+[Go Back Up](#table-of-contents)
 
 ## API Description
 
@@ -187,13 +185,13 @@ Base URL  :  https://72e5x0myo8.execute-api.us-east-1.amazonaws.com/dev/
 | `/payloadBatchHashesByAppGateway` | GET                                                         | Returns payload batch hashes associated with an app gateway address | `appGateway` (string): Address of the app gateway to fetch batches for                                                                                | Array of payload batch hashes                                                              |
 | `/payloadBatchesByVMTxHash`       | GET                                                         | Returns payload batches associated with a VM transaction hash       | `vmTxHash` (string): Transaction hash to fetch batches for                                                                                            | Array of payload batch details                                                             |
 
----
+[Go Back Up](#table-of-contents)
 
 ## What We Just Deployed
 
 By running the deployment script, we deployed three key contracts.
 
-### Deployer Contract - Manage your chain-abstracted contract deployments
+### Deployer Contract - Manage Your Chain-abstracted Contract Deployments
 
 This contract:
 
@@ -232,7 +230,7 @@ contract CounterDeployer is AppDeployerBase {
 }
 ```
 
-### Application Gateway Contract - Your chain-abstracted application that handles cross-chain messaging
+### Application Gateway Contract - Your Chain-abstracted Counter Application
 
 This contract:
 
@@ -256,7 +254,7 @@ contract CounterGateway is AppGatewayBase {
 }
 ```
 
-### Logic Contract - Your onchain operational contract
+### Logic Contract - Your Counter Contract Deployed On Chain
 
 Provides chain-specific functionality.
 
@@ -294,7 +292,7 @@ Our architecture includes onchain and offchain contracts and an offchain Watcher
 - **Logic Contract**: This is the onchain component responsible for chain-specific logic and integration.
 
 
-![architecure diagram](images/architecture.png)
+![architecure diagram](docs/images/architecture.png)
 
 If you notice, the Forwarder Address is a proxy representation created on the VM chain. Any calls to onchain contracts should be sent to the corresponding proxy contract, which will route the call properly to the on chain contract via Payload Delivery. See [how to find a chain specific-forwarder-address](#find-a-chain-specific-forwarder-address)
 
@@ -314,3 +312,5 @@ Key addresses:
 ```
 
 The architecture leverages the Watcher VM for monitoring and relaying cross-chain messages efficiently.
+
+[Go Back Up](#table-of-contents)
