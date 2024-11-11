@@ -90,5 +90,5 @@ By running the deployment script, we deployed three key contracts:
 
 - **Deployer and Application Contracts**: These live on an *offchain* Watcher VM. The Watcher VM monitors cross-chain events and triggers *onchain* actions on the contracts deployed on respective chains.
 - **Logic Contract**: This is the *onchain* component responsible for chain-specific logic and integration.
-![architecure diagram](images/architecture.png)
+![architecure diagram](docs/images/architecture.png)
 
