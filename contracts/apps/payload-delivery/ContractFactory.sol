@@ -3,7 +3,6 @@ pragma solidity ^0.8.13;
 import {DEPLOY, CONFIGURE, ETH_ADDRESS} from "../../common/Constants.sol";
 
 abstract contract ContractFactory {
-    uint256 public counter;
     event Deployed(address addr, bytes32 salt);
 
     function _handleDeploy(bytes memory data) internal returns (bytes memory) {
@@ -18,8 +17,6 @@ abstract contract ContractFactory {
             data,
             (bytes, bytes32)
         );
-
-        salt = bytes32(uint256(salt) + counter++);
 
         address addr;
         assembly {

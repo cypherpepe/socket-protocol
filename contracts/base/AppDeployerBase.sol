@@ -44,7 +44,7 @@ abstract contract AppDeployerBase is AppGatewayBase, IAppDeployer {
     function getContractAddresses(
         address cloudContractAddr,
         uint32 chainSlug
-    ) public view returns (address forwarderContractAddr) {
+    ) internal view returns (address forwarderContractAddr) {
         forwarderContractAddr = IForwarder(
             forwarderAddresses[cloudContractAddr][chainSlug]
         ).getOnChainAddress();

@@ -135,7 +135,7 @@ contract AuctionHouseTest is SetupTest {
         address vmContractAddr_,
         address appDeployer_,
         bytes memory bytecode_
-    ) internal pure returns (PayloadDetails memory) {
+    ) internal view returns (PayloadDetails memory) {
         bytes32 salt = keccak256(abi.encode(appDeployer_, chainSlug_));
         bytes memory payload = abi.encode(bytecode_, salt);
         bytes memory data = abi.encode(chainSlug_, vmContractAddr_);
@@ -229,7 +229,7 @@ contract AuctionHouseTest is SetupTest {
         return (watcherSig, root);
     }
 
-     function createExecutePayloadDetail(
+    function createExecutePayloadDetail(
         uint32 chainSlug_,
         address target_,
         bytes memory payload_
