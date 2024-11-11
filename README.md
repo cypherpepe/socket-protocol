@@ -4,24 +4,28 @@ This guide will help you build chain-abstracted applications using our framework
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Deploying a chain-abstracted Counter contract](#deploying-a-counter)
-  - [Incrementing the counter](#incrementing-the-counter-on-a-specific-chain)
-    - [How to find a chain specific-forwarder-address](#find-a-chain-specific-forwarder-address)
-  - [Covering gas and fees to be executed onchain](#paying-for-your-transaction-to-be-sent-onchain)
+## Table of Contents
+- [Getting Started](#getting-started)
+  - [Create Your Counter Deployer Contract](#create-your-counter-deployer-contract)
+  - [Create Your Chain-abstracted Counter App](#create-your-chain-abstracted-counter-app)
+  - [Create Your Counter Contract (deployed on chain)](#create-your-counter-contract-deployed-on-chain)
+- [Deploying a Counter](#deploying-a-counter)
+- [Incrementing the Counter on a Specific Chain](#incrementing-the-counter-on-a-specific-chain)
+  - [Find a Chain Specific Forwarder Address](#find-a-chain-specific-forwarder-address)
+- [Validating that the Payload was Sent](#validating-that-the-payload-was-sent)
+- [Paying for Your Transaction to Be Sent Onchain](#paying-for-your-transaction-to-be-sent-onchain)
+  - [How to Pay Fees Through Any Chain](#how-to-pay-fees-through-any-chain)
+- [API Description](#api-description)
 - [What We Just Deployed](#what-we-just-deployed)
-  - [Architecture](#architecture-details)
+  - [Architecture Details](#architecture-details)
 
 ---
 
-## Overview
+## Getting Started
 
 We will explore a chain-abstracted version of the `Counter.sol` contract, inspired by the default Foundry example. The purpose of this example is to demonstrate how to implement counter logic in a way that abstracts away the details of the specific blockchain where the contract is deployed.
 
 The goal is to provide a simple and intuitive interface for increasing a counter, ensuring that the underlying logic works seamlessly across different chains without requiring the developer to manage chain-specific details or configurations.
-
----
-## Getting Started
 
 ### Create Your Counter Deployer Contract
 ```solidity
