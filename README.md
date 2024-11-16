@@ -264,7 +264,7 @@ contract CounterPlug is Ownable(msg.sender) {
     uint256 public counter;
 
     modifier onlySocket() {
-        require(msg.sender == socket, "not sokcet");
+        require(msg.sender == socket, "not socket");
         _;
     }
 
@@ -292,7 +292,7 @@ Our architecture includes onchain and offchain contracts and an offchain Watcher
 - **Logic Contract**: This is the onchain component responsible for chain-specific logic and integration.
 
 
-![architecure diagram](docs/images/architecture.png)
+![architecture diagram](docs/images/architecture.png)
 
 If you notice, the Forwarder Address is a proxy representation created on the VM chain. Any calls to onchain contracts should be sent to the corresponding proxy contract, which will route the call properly to the on chain contract via Payload Delivery. See [how to find a chain specific-forwarder-address](#find-a-chain-specific-forwarder-address)
 
